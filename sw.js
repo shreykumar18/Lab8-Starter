@@ -3,13 +3,42 @@
 
 const CACHE_NAME = 'lab-8-starter';
 
+
+
+const ASSETS = [
+  './',
+  './index.html',
+  './assets/scripts/main.js',
+  './assets/scripts/RecipeCard.js',
+  './assets/images/icons/0-star.svg',
+  './assets/images/icons/1-star.svg',
+  './assets/images/icons/2-star.svg',
+  './assets/images/icons/3-star.svg',
+  './assets/images/icons/4-star.svg',
+  './assets/images/icons/5-star.svg',
+  './assets/images/icons/arrow-down.png',
+  './assets/images/icons/icon-192x192.png',
+  './assets/images/icons/icon-256x256.png',
+  './assets/images/icons/icon-384x384.png',
+  './assets/images/icons/icon-512x512.png'
+];
+
+
 // Installs the service worker. Feed it some initial URLs to cache
 self.addEventListener('install', function (event) {
   event.waitUntil(
     caches.open(CACHE_NAME).then(function (cache) {
       // B6. TODO - Add all of the URLs from RECIPE_URLs here so that they are
       //            added to the cache when the ServiceWorker is installed
-      return cache.addAll([]);
+      
+
+      
+      return cache.addAll(['https://adarsh249.github.io/Lab8-Starter/recipes/1_50-thanksgiving-side-dishes.json',
+      'https://adarsh249.github.io/Lab8-Starter/recipes/2_roasting-turkey-breast-with-stuffing.json',
+      'https://adarsh249.github.io/Lab8-Starter/recipes/3_moms-cornbread-stuffing.json',
+      'https://adarsh249.github.io/Lab8-Starter/recipes/4_50-indulgent-thanksgiving-side-dishes-for-any-holiday-gathering.json',
+      'https://adarsh249.github.io/Lab8-Starter/recipes/5_healthy-thanksgiving-recipe-crockpot-turkey-breast.json',
+      'https://adarsh249.github.io/Lab8-Starter/recipes/6_one-pot-thanksgiving-dinner.json',]);
     })
   );
 });
@@ -37,4 +66,20 @@ self.addEventListener('fetch', function (event) {
   // B8. TODO - If the request is in the cache, return with the cached version.
   //            Otherwise fetch the resource, add it to the cache, and return
   //            network response.
+
+  event.respondWith(
+    caches.match(event.request).then(function (response) {
+      if (response) {
+        return response;
+      }
+      return fetch(event.request).then(function (networkResponse) {
+        return caches.open(CACHE_NAME).then(function (cache) {
+          cache.put(event.request, networkResponse.clone());
+          return networkResponse;
+        });
+      });
+    }).catch(function () {
+      return caches.match('./index.html'); 
+    })
+  );
 });
